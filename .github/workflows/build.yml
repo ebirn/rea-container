@@ -1,0 +1,27 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: podman build -f Containerfile -t rea-sandbox .
+      - name: Self-check in hardened container
+        run: |
+          podman run --rm --network=none --cap-drop=ALL \
+            --security-opt no-new-privileges --read-only \
+            --tmpfs /tmp:rw,size=1g --tmpfs /home/node:rw,size=512m \
+            rea-sandbox mcp doctor --json | tee doctor.json
+          grep -q '"healthy": true' doctor.json
