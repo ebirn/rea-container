@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "rea": {
+      "command": "podman",
+      "args": ["run","-i","--rm","--pull=missing","--network=none","--cap-drop=ALL","--security-opt=no-new-privileges","--read-only","--tmpfs","/tmp:rw,size=1g","--tmpfs","/home/node:rw,size=512m,mode=1777","-v","./:/samples:ro","-v","rea-out:/out:U","ghcr.io/ebirn/rea-container:latest"]
+    }
+  }
+}

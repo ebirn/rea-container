@@ -1,0 +1,12 @@
+{
+  "name": "rea-container",
+  "owner": { "name": "ebirn" },
+  "description": "REA reverse-engineering MCP server in a hardened offline Podman container",
+  "plugins": [
+    {
+      "name": "rea-container",
+      "source": "./plugins/rea-container",
+      "description": "REA reverse-engineering MCP server in a hardened offline Podman container"
+    }
+  ]
+}

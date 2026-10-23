@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "rea-container",
+  "version": "0.1.0",
+  "description": "REA reverse-engineering MCP server running in a hardened, offline, rootless Podman container with Ghidra, JADX, Kuna, Rizin, Binwalk, unblob and more.",
+  "author": {
+    "name": "ebirn"
+  },
+  "homepage": "https://github.com/ebirn/rea-container",
+  "repository": "https://github.com/ebirn/rea-container",
+  "keywords": [
+    "reverse-engineering",
+    "ghidra",
+    "firmware",
+    "mcp",
+    "podman",
+    "sandbox"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "REA (sandboxed)",
+        "shortDescription": "Reverse engineering in an offline Podman sandbox",
+        "category": "Coding"
+      }
+    }
+  }
+}

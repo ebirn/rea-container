@@ -1,0 +1,19 @@
+{
+  "name": "rea-container",
+  "displayName": "REA (sandboxed)",
+  "version": "0.1.0",
+  "description": "REA reverse-engineering MCP server running in a hardened, offline, rootless Podman container with Ghidra, JADX, Kuna, Rizin, Binwalk, unblob and more.",
+  "author": {
+    "name": "ebirn"
+  },
+  "homepage": "https://github.com/ebirn/rea-container",
+  "repository": "https://github.com/ebirn/rea-container",
+  "keywords": [
+    "reverse-engineering",
+    "ghidra",
+    "firmware",
+    "mcp",
+    "podman",
+    "sandbox"
+  ]
+}

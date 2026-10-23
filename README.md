@@ -23,7 +23,29 @@ Not included: Hopper, IDA and JEB (commercial), Cutter (GUI), Frida, and the Ghi
 extension (needs its own build). `rea doctor` reports Hopper, IDA and agent registrations as
 missing; that is expected inside the container.
 
+## Install as a plugin (Claude Code and Codex)
+
+Requires [Podman](https://podman.io) (on macOS: `brew install podman && podman machine init --now`).
+The plugin runs the published image `ghcr.io/ebirn/rea-container` (amd64 + arm64, about 1.5 GB,
+pulled on first use; pull it up front with `podman pull ghcr.io/ebirn/rea-container:latest`).
+
+Claude Code:
+
+    /plugin marketplace add ebirn/rea-container
+    /plugin install rea-container@rea-container
+
+Codex:
+
+    codex plugin marketplace add ebirn/rea-container
+
+then install `rea-container` from the Plugins directory.
+
+The agent's working directory is mounted read-only at `/samples` (the bundled skill tells the
+agent to use `/samples/...` paths); `/out` is a writable named volume `rea-out`; there is no
+network. On Linux with SELinux you may need to label the project directory for the mount.
+
 ## Build
+
 
     podman build -t rea-sandbox .
 

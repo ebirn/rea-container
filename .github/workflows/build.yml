@@ -10,14 +10,29 @@ on:
 
 permissions:
   contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/ebirn/rea-container
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
       - name: Build image
-        run: podman build -f Containerfile -t rea-sandbox .
+        run: |
+          podman build -f Containerfile -t rea-sandbox \
+            --label org.opencontainers.image.source=https://github.com/${{ github.repository }} \
+            --label org.opencontainers.image.revision=${{ github.sha }} .
       - name: Tool versions
         run: |
           podman run --rm --entrypoint sh rea-sandbox -c '
@@ -47,3 +62,23 @@ jobs:
         run: |
           ./run.sh mcp doctor --json | tee mcp-doctor.json
           grep -q '"healthy": true' mcp-doctor.json
+      - name: Push image
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          podman tag rea-sandbox "$IMAGE:${{ github.sha }}-${{ matrix.arch }}"
+          podman push "$IMAGE:${{ github.sha }}-${{ matrix.arch }}"
+
+  manifest:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish multi-arch tag
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          podman manifest create rea
+          podman manifest add rea "docker://$IMAGE:${{ github.sha }}-amd64"
+          podman manifest add rea "docker://$IMAGE:${{ github.sha }}-arm64"
+          podman manifest push --all rea "docker://$IMAGE:latest"
+          podman manifest push --all rea "docker://$IMAGE:${{ github.sha }}"
