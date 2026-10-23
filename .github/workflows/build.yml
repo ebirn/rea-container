@@ -30,7 +30,8 @@ jobs:
       - name: REA doctor in hardened container
         run: |
           mkdir -p samples out
-          ./run.sh doctor --json > doctor.json
+          # doctor exits non-zero while Hopper/IDA/agent registrations are absent (expected)
+          ./run.sh doctor --json > doctor.json || true
           python3 -I - <<'PY'
           import json, sys
           d = json.load(open("doctor.json"))
