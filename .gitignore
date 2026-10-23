@@ -2,3 +2,4 @@ samples/*
 out/*
 !samples/.gitkeep
 !out/.gitkeep
+.DS_Store
