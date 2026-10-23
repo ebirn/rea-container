@@ -18,10 +18,31 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build image
         run: podman build -f Containerfile -t rea-sandbox .
-      - name: Self-check in hardened container
+      - name: Tool versions
         run: |
-          podman run --rm --network=none --cap-drop=ALL \
-            --security-opt no-new-privileges --read-only \
-            --tmpfs /tmp:rw,size=1g --tmpfs /home/node:rw,size=512m \
-            rea-sandbox mcp doctor --json | tee doctor.json
-          grep -q '"healthy": true' doctor.json
+          podman run --rm --entrypoint sh rea-sandbox -c '
+            /opt/binwalk/bin/binwalk --version; /opt/venv-unblob/bin/unblob --version
+            tshark --version | head -1; sigrok-cli --version | head -1; apktool --version
+            wakaru --version; kuna --version; rizin -v | head -1; mitmdump --version | head -1
+            /opt/ilspycmd/ilspycmd --version | head -1; wasm2wat --version; adb version | head -1
+            objdump --version | head -1; gdb --version | head -1; chromium-container --version
+            /opt/venv-pwn/bin/pip list 2>/dev/null | grep -iE "pwntools|pyelftools|unicorn"'
+      - name: REA doctor in hardened container
+        run: |
+          mkdir -p samples out
+          ./run.sh doctor --json > doctor.json
+          python3 -I - <<'PY'
+          import json, sys
+          d = json.load(open("doctor.json"))
+          checks = {c["name"]: c for c in d["scope_checks"]}
+          required = ["ghidra-version", "ghidra-native_decompiler", "ghidra-java", "jadx",
+                      "kuna-installation", "kuna-cache", "ilspycmd"]
+          bad = [n for n in required if not checks.get(n, {}).get("ok")]
+          for n in required:
+              print("ok  " if n not in bad else "FAIL", n)
+          sys.exit(1 if bad else 0)
+          PY
+      - name: MCP self-check
+        run: |
+          ./run.sh mcp doctor --json | tee mcp-doctor.json
+          grep -q '"healthy": true' mcp-doctor.json
