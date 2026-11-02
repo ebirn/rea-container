@@ -10,14 +10,14 @@ through `REA_*` environment variables:
 
 | Purpose | Tools |
 |---|---|
-| Native decompilation | Ghidra 12.1.4 headless + JDK 21 (arm64: native decompiler built from source), Kuna 1.979, Rizin 0.9.1 (static on amd64, built on arm64), GNU objdump, GDB 16 + pwndbg 2026.09.15 |
-| Android | JADX headless MCP 0.7.1, Apktool 3.0.3, adb |
+| Native decompilation | Ghidra 12.2 headless + JDK 21 (arm64: native decompiler built from source), Kuna 1.988, Rizin 0.9.1 (static on amd64, built on arm64), GNU objdump, GDB 16 + pwndbg 2026.10.28 |
+| Android | JADX headless MCP 0.8.0, Apktool 3.0.3, adb |
 | .NET | ILSpy (`ilspycmd`) + .NET 10 runtime |
-| JavaScript / web | Wakaru 1.14.0, Chromium, mitmproxy (`mitmdump`) 12.2.3 |
+| JavaScript / web | Wakaru 1.15.0, Chromium, mitmproxy (`mitmdump`) 12.3.1 |
 | Firmware | Binwalk 3.1.0 (built from source), unblob 26.6.4 (+ jefferson, ubi_reader), 7-Zip, squashfs-tools, e2fsprogs, lz4, zstd, lzop, cpio, unar, mtd-utils |
 | Network / signals | TShark 4.4, sigrok-cli 0.7.2 |
 | WebAssembly | WABT 1.0.42 |
-| ELF / crashes | pwntools 4.15.0, pyelftools 0.33, Unicorn 2.1.2 |
+| ELF / crashes | pwntools 4.15.0, pyelftools 0.33, Unicorn 2.1.4 |
 
 Not included: Hopper, IDA and JEB (commercial), Cutter (GUI), Frida, and the Ghidra NativeAOT
 extension (needs its own build). `rea doctor` reports Hopper, IDA and agent registrations as
