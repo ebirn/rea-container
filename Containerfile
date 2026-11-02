@@ -25,12 +25,12 @@ RUN printf '%s\n' '#!/bin/sh' 'set -eu' 'mkdir -p /dl && cd /dl' \
  && chmod +x /usr/local/bin/dl \
  && mkdir -p /opt/rea /opt/bin
 
-ARG GHIDRA_VERSION=12.1.4
+ARG GHIDRA_VERSION=12.2
 RUN dl ghidra-${GHIDRA_VERSION}.zip \
-      https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${GHIDRA_VERSION}_build/ghidra_${GHIDRA_VERSION}_PUBLIC_20260921.zip \
+      https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${GHIDRA_VERSION}_build/ghidra_${GHIDRA_VERSION}_PUBLIC_20261016.zip \
  && unzip -q /dl/ghidra-*.zip -d /opt && mv /opt/ghidra_* /opt/ghidra && rm /dl/*
 
-ARG JADX_MCP_VERSION=0.7.1
+ARG JADX_MCP_VERSION=0.8.0
 RUN dl jadx-headless-mcp-${JADX_MCP_VERSION}-all.jar \
       https://github.com/1013503897/jadx-headless-mcp/releases/download/v${JADX_MCP_VERSION}/jadx-headless-mcp-${JADX_MCP_VERSION}-all.jar \
  && mv /dl/*.jar /opt/rea/
@@ -46,26 +46,26 @@ RUN case "$TARGETARCH" in amd64) a=x64;; arm64) a=arm64;; esac \
       https://github.com/WebAssembly/wabt/releases/download/${WABT_VERSION}/wabt-${WABT_VERSION}-linux-$a.tar.gz \
  && mkdir /opt/wabt && tar -xzf /dl/wabt-*.tar.gz -C /opt/wabt --strip-components=1
 
-ARG KUNA_VERSION=1.979
+ARG KUNA_VERSION=1.988
 RUN case "$TARGETARCH" in amd64) a=x86_64;; arm64) a=arm64;; esac \
  && dl kuna-linux-$a.tar.gz \
       https://github.com/Noelo-Lab/kuna/releases/download/v${KUNA_VERSION}/kuna-v${KUNA_VERSION}-linux-$a.tar.gz \
  && mkdir /opt/kuna && tar -xzf /dl/kuna-linux-*.tar.gz -C /opt/kuna --strip-components=1 \
  && install -m755 /opt/kuna/kuna /opt/bin/kuna
 
-ARG PWNDBG_VERSION=2026.09.15
+ARG PWNDBG_VERSION=2026.10.28
 RUN case "$TARGETARCH" in amd64) a=x86_64;; arm64) a=arm64;; esac \
  && dl pwndbg-$a.tar.xz \
       https://github.com/pwndbg/pwndbg/releases/download/${PWNDBG_VERSION}/pwndbg_${PWNDBG_VERSION}_$a-portable.tar.xz \
  && tar -xJf /dl/pwndbg-*.tar.xz -C /opt
 
-ARG MITMPROXY_VERSION=12.2.3
+ARG MITMPROXY_VERSION=12.3.1
 RUN case "$TARGETARCH" in amd64) a=x86_64;; arm64) a=aarch64;; esac \
  && dl mitmproxy-linux-$a.tar.gz \
       https://downloads.mitmproxy.org/${MITMPROXY_VERSION}/mitmproxy-${MITMPROXY_VERSION}-linux-$a.tar.gz \
  && mkdir /opt/mitmproxy && tar -xzf /dl/mitmproxy-linux-*.tar.gz -C /opt/mitmproxy
 
-ARG WAKARU_VERSION=1.14.0
+ARG WAKARU_VERSION=1.15.0
 RUN case "$TARGETARCH" in amd64) a=x64;; arm64) a=arm64;; esac \
  && npm install --prefix /opt/wakaru --no-audit --no-fund @wakaru/cli@${WAKARU_VERSION} \
  && install -m755 /opt/wakaru/node_modules/@wakaru/cli-linux-$a/wakaru /opt/bin/wakaru
@@ -76,11 +76,11 @@ RUN case "$TARGETARCH" in amd64) a=x64;; arm64) a=arm64;; esac \
 # ---------------------------------------------------------------------------
 FROM ${DEBIAN_IMAGE} AS ghidra-decompiler
 ARG TARGETARCH
-ARG GHIDRA_VERSION=12.1.4
+ARG GHIDRA_VERSION=12.2
 RUN apt-get update \
  && apt-get install -y --no-install-recommends git ca-certificates g++ make zlib1g-dev bison flex \
  && rm -rf /var/lib/apt/lists/*
-ARG GHIDRA_COMMIT=8b6bbb857accdfa20dc5b2f5dea471178c2e9fbc
+ARG GHIDRA_COMMIT=8ca9077040cc43cd790babcfccf19475622a3e9a
 RUN mkdir -p /out && if [ "$TARGETARCH" = arm64 ]; then \
       git clone -q --depth 1 --filter=blob:none --sparse --branch "Ghidra_${GHIDRA_VERSION}_build" \
         https://github.com/NationalSecurityAgency/ghidra.git /src \
@@ -134,7 +134,7 @@ RUN apt-get update \
       pkg-config libmagic1 \
  && rm -rf /var/lib/apt/lists/*
 RUN python3 -m venv /opt/venv-pwn \
- && /opt/venv-pwn/bin/pip install --no-cache-dir pwntools==4.15.0 pyelftools==0.33 unicorn==2.1.2
+ && /opt/venv-pwn/bin/pip install --no-cache-dir pwntools==4.15.0 pyelftools==0.33 unicorn==2.1.4
 ARG UNBLOB_VERSION=26.6.4
 RUN python3 -m venv /opt/venv-unblob \
  && /opt/venv-unblob/bin/pip install --no-cache-dir unblob==${UNBLOB_VERSION} jefferson ubi_reader
@@ -183,7 +183,7 @@ RUN printf '#!/bin/sh\nexec java -jar /opt/rea/apktool.jar "$@"\n' > /usr/local/
  && printf '#!/bin/sh\nexec /usr/bin/chromium --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"\n' > /usr/local/bin/chromium-container \
  && chmod +x /usr/local/bin/apktool /usr/local/bin/chromium-container
 
-ARG REA_VERSION=6.7.0
+ARG REA_VERSION=6.8.0
 RUN npm install -g --no-audit --no-fund "rea-agents@${REA_VERSION}"
 
 ENV PATH=/opt/rizin/bin:/opt/bin:/opt/wabt/bin:/opt/mitmproxy:$PATH \
@@ -192,7 +192,7 @@ ENV PATH=/opt/rizin/bin:/opt/bin:/opt/wabt/bin:/opt/mitmproxy:$PATH \
     DOTNET_ROOT=/usr/share/dotnet \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
     GHIDRA_INSTALL_DIR=/opt/ghidra \
-    REA_JADX_MCP_JAR=/opt/rea/jadx-headless-mcp-0.7.1-all.jar \
+    REA_JADX_MCP_JAR=/opt/rea/jadx-headless-mcp-0.8.0-all.jar \
     REA_APKTOOL_COMMAND=/usr/local/bin/apktool \
     REA_WABT_BIN_DIRECTORY=/opt/wabt/bin \
     REA_BINWALK_COMMAND=/opt/binwalk/bin/binwalk \
