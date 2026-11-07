@@ -143,7 +143,12 @@ RUN python3 -m venv /opt/venv-unblob \
 # ILSpy command line for .NET assemblies
 # ---------------------------------------------------------------------------
 FROM ${DOTNET_SDK_IMAGE} AS ilspy
-RUN dotnet tool install ilspycmd --tool-path /opt/ilspycmd
+# Since 11.2 amd64 gets a native ilspycmd.linux-x64 binary (arm64 falls back to the portable
+# ilspycmd.any), packed without an execute bit; the store is also owner-only. The runtime
+# runs as node, so open it up.
+RUN dotnet tool install ilspycmd --tool-path /opt/ilspycmd \
+ && chmod -R a+rX /opt/ilspycmd \
+ && find /opt/ilspycmd/.store -path '*/tools/*' -type f -name ilspycmd -exec chmod 755 {} +
 
 # ---------------------------------------------------------------------------
 # Runtime image
