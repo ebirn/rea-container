@@ -26,8 +26,12 @@ missing; that is expected inside the container.
 ## Install as a plugin (Claude Code and Codex)
 
 Requires [Podman](https://podman.io) (on macOS: `brew install podman && podman machine init --now`).
-The plugin runs the published image `ghcr.io/ebirn/rea-container` (amd64 + arm64, about 1.5 GB,
-pulled on first use; pull it up front with `podman pull ghcr.io/ebirn/rea-container:latest`).
+The plugin runs the published image `ghcr.io/ebirn/rea-container:latest` (amd64 + arm64, about
+1.5 GB, pulled on first use; pull it up front with `podman pull ghcr.io/ebirn/rea-container:latest`).
+
+Image tags: `:latest` is the newest [release](https://github.com/ebirn/rea-container/releases),
+`:vX.Y.Z` a specific release (e.g. `:v0.2.0`), `:main` the current `main` branch build, and
+`:<commit sha>` a single commit. To update after a release, pull `:latest` again.
 
 Claude Code:
 
@@ -103,5 +107,6 @@ Do not run `npx rea-agents setup` on the host; it would add an unsandboxed copy.
 
 ## CI
 
-GitHub Actions builds the image on every push, PR and weekly, and runs `rea mcp doctor`
-inside the hardened container.
+GitHub Actions builds the image on every push, PR, release tag and weekly, and runs the REA doctor
+checks inside the hardened container. Pushes to `main` publish `:main`; pushing a `vX.Y.Z` tag
+publishes `:vX.Y.Z` and moves `:latest`.

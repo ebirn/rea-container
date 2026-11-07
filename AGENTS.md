@@ -34,9 +34,9 @@ Tool versions follow what the pinned `rea-agents` release verifies, not the newe
 
 ## CI and publishing
 
-`.github/workflows/build.yml` builds natively per arch (amd64 and arm64 runners), runs the doctor checks, and on `main` pushes `ghcr.io/ebirn/rea-container:<sha>-<arch>`; the `manifest` job then joins them into a multi-arch `:latest` and `:<sha>`. It also runs weekly to pick up upstream changes.
+`.github/workflows/build.yml` builds natively per arch (amd64 and arm64 runners), runs the doctor checks, and on `main` and on `v*` tags pushes `ghcr.io/ebirn/rea-container:<sha>-<arch>`; the `manifest` job then joins them into multi-arch tags: `:main` and `:<sha>` for `main`, `:vX.Y.Z` and `:latest` for a release tag. `:latest` (what the plugin runs) therefore only moves on releases. It also runs weekly to pick up upstream changes, which publishes `:main` only.
 
-Releases are GitHub releases tagged `v<plugin version>` on `main`, published after the PR is merged and CI has pushed `:latest`. Bump the plugin version (both `plugin.json` files) in the same PR as the change it releases.
+Releases are GitHub releases tagged `v<plugin version>` on `main`. Bump the plugin version (both `plugin.json` files) in the same PR as the change it releases; a tag build fails if the tag does not match both `plugin.json` versions. Publishing the release creates the tag, which builds and publishes `:vX.Y.Z` and moves `:latest`.
 
 ## Plugin layout (`plugins/rea-container/`)
 
