@@ -44,6 +44,29 @@ The agent's working directory is mounted read-only at `/samples` (the bundled sk
 agent to use `/samples/...` paths); `/out` is a writable named volume `rea-out`; there is no
 network. On Linux with SELinux you may need to label the project directory for the mount.
 
+### Enable it only where you need it
+
+The host starts one container for every agent session with the plugin enabled, whether or not
+REA is used, and keeps it until that session exits (about 230 MB each). With several sessions
+open, those idle containers add up in the Podman VM. Keep the plugin disabled by default and
+enable it only in the projects where you reverse engineer.
+
+Claude Code (and agents built on it, such as Zed's Claude agent):
+
+    claude plugin disable rea-container@rea-container --scope user
+    # in each reverse-engineering project:
+    claude plugin enable rea-container@rea-container --scope local     # just you (.claude/settings.local.json)
+    claude plugin enable rea-container@rea-container --scope project   # whole team (.claude/settings.json)
+
+The project setting overrides the user-level `false`. Codex: set `enabled = false` under
+`[plugins."rea-container@rea-container"]` in `~/.codex/config.toml` and turn it on when needed.
+
+The containers carry the label `io.github.ebirn.rea-container=mcp`. To list them, or to remove
+them all (this also cuts off sessions still using REA):
+
+    podman ps --filter label=io.github.ebirn.rea-container=mcp
+    podman rm -f $(podman ps -q --filter label=io.github.ebirn.rea-container=mcp)
+
 ## Build
 
 
