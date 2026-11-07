@@ -21,5 +21,11 @@ The REA MCP server runs inside an offline, rootless Podman container. Host paths
   missing agent registrations or Hopper/IDA from `doctor` are expected.
 - If a tool fails because the image is missing, run `podman pull ghcr.io/ebirn/rea-container:latest`
   (about 1.5 GB) and restart the session.
+- **Container lifetime:** each agent session runs its own container, labelled
+  `io.github.ebirn.rea-container=mcp`, until the session exits. If the user asks about idle REA
+  containers, list them with `podman ps --filter label=io.github.ebirn.rea-container=mcp`.
+  Removing them disconnects every session still using one, this one included, so do it only on
+  request. To avoid them, suggest enabling the plugin only in reverse-engineering projects
+  (see the README section "Enable it only where you need it").
 
 For the investigation workflow itself, follow the `reverse-engineer-anything` skill.
