@@ -3,14 +3,14 @@
 Run [REA](https://github.com/morluto/rea) (Reverse Engineer Anything, an MCP server for
 reverse engineering) inside a hardened rootless Podman container.
 
-Multi-stage build on `node:24-trixie-slim`, for linux/amd64 and linux/arm64. Prebuilt upstream
+Multi-stage build on `node:24.22.1-trixie-slim` (the Node release REA 6.8.0 pins), for linux/amd64 and linux/arm64. Prebuilt upstream
 binaries are used wherever they exist (checksums pinned in `SHA256SUMS`); the rest is compiled in
 throwaway stages. Everything REA can drive without a commercial license is installed and wired up
 through `REA_*` environment variables:
 
 | Purpose | Tools |
 |---|---|
-| Native decompilation | Ghidra 12.1.4 headless + JDK 21 (arm64: native decompiler built from source), Kuna 1.979, Rizin 0.9.1 (static on amd64, built on arm64), GNU objdump, GDB 16 + pwndbg 2026.09.15 |
+| Native decompilation | Ghidra 12.1.4 headless + JDK 21 (arm64: native decompiler built from source), Kuna 1.833, Rizin 0.9.1 (static on amd64, built on arm64), GNU objdump, GDB 16 + pwndbg 2026.09.15 |
 | Android | JADX headless MCP 0.7.1, Apktool 3.0.3, adb |
 | .NET | ILSpy (`ilspycmd`) + .NET 10 runtime |
 | JavaScript / web | Wakaru 1.14.0, Chromium, mitmproxy (`mitmdump`) 12.2.3 |
