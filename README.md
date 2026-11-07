@@ -26,8 +26,12 @@ missing; that is expected inside the container.
 ## Install as a plugin (Claude Code and Codex)
 
 Requires [Podman](https://podman.io) (on macOS: `brew install podman && podman machine init --now`).
-The plugin runs the published image `ghcr.io/ebirn/rea-container` (amd64 + arm64, about 1.5 GB,
-pulled on first use; pull it up front with `podman pull ghcr.io/ebirn/rea-container:latest`).
+The plugin runs the published image `ghcr.io/ebirn/rea-container:latest` (amd64 + arm64, about
+1.5 GB, pulled on first use; pull it up front with `podman pull ghcr.io/ebirn/rea-container:latest`).
+
+Image tags: `:latest` is the newest [release](https://github.com/ebirn/rea-container/releases),
+`:vX.Y.Z` a specific release (e.g. `:v0.2.0`), `:main` the current `main` branch build, and
+`:<commit sha>` a single commit. To update after a release, pull `:latest` again.
 
 Claude Code:
 
@@ -43,6 +47,29 @@ then install `rea-container` from the Plugins directory.
 The agent's working directory is mounted read-only at `/samples` (the bundled skill tells the
 agent to use `/samples/...` paths); `/out` is a writable named volume `rea-out`; there is no
 network. On Linux with SELinux you may need to label the project directory for the mount.
+
+### Enable it only where you need it
+
+The host starts one container for every agent session with the plugin enabled, whether or not
+REA is used, and keeps it until that session exits (about 230 MB each). With several sessions
+open, those idle containers add up in the Podman VM. Keep the plugin disabled by default and
+enable it only in the projects where you reverse engineer.
+
+Claude Code (and agents built on it, such as Zed's Claude agent):
+
+    claude plugin disable rea-container@rea-container --scope user
+    # in each reverse-engineering project:
+    claude plugin enable rea-container@rea-container --scope local     # just you (.claude/settings.local.json)
+    claude plugin enable rea-container@rea-container --scope project   # whole team (.claude/settings.json)
+
+The project setting overrides the user-level `false`. Codex: set `enabled = false` under
+`[plugins."rea-container@rea-container"]` in `~/.codex/config.toml` and turn it on when needed.
+
+The containers carry the label `io.github.ebirn.rea-container=mcp`. To list them, or to remove
+them all (this also cuts off sessions still using REA):
+
+    podman ps --filter label=io.github.ebirn.rea-container=mcp
+    podman rm -f $(podman ps -q --filter label=io.github.ebirn.rea-container=mcp)
 
 ## Build
 
@@ -80,5 +107,6 @@ Do not run `npx rea-agents setup` on the host; it would add an unsandboxed copy.
 
 ## CI
 
-GitHub Actions builds the image on every push, PR and weekly, and runs `rea mcp doctor`
-inside the hardened container.
+GitHub Actions builds the image on every push, PR, release tag and weekly, and runs the REA doctor
+checks inside the hardened container. Pushes to `main` publish `:main`; pushing a `vX.Y.Z` tag
+publishes `:vX.Y.Z` and moves `:latest`.
