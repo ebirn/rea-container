@@ -61,7 +61,7 @@ jobs:
       - name: MCP self-check
         run: |
           ./run.sh mcp doctor --json | tee mcp-doctor.json
-          grep -q '"healthy": true' mcp-doctor.json
+          python3 -I -c 'import json, sys; sys.exit(0 if json.load(open("mcp-doctor.json"))["healthy"] is True else 1)'
       - name: Push image
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
