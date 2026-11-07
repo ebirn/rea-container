@@ -3,7 +3,7 @@
 # wherever they exist; things with no binary (Binwalk 3, arm64 Rizin) are compiled.
 # Works for linux/amd64 and linux/arm64 (TARGETARCH).
 
-ARG NODE_IMAGE=docker.io/library/node:24-trixie-slim
+ARG NODE_IMAGE=docker.io/library/node:24.22.1-trixie-slim
 ARG DEBIAN_IMAGE=docker.io/library/debian:trixie-slim
 ARG RUST_IMAGE=docker.io/library/rust:1-slim-trixie
 ARG DOTNET_SDK_IMAGE=mcr.microsoft.com/dotnet/sdk:10.0
@@ -46,7 +46,7 @@ RUN case "$TARGETARCH" in amd64) a=x64;; arm64) a=arm64;; esac \
       https://github.com/WebAssembly/wabt/releases/download/${WABT_VERSION}/wabt-${WABT_VERSION}-linux-$a.tar.gz \
  && mkdir /opt/wabt && tar -xzf /dl/wabt-*.tar.gz -C /opt/wabt --strip-components=1
 
-ARG KUNA_VERSION=1.979
+ARG KUNA_VERSION=1.833
 RUN case "$TARGETARCH" in amd64) a=x86_64;; arm64) a=arm64;; esac \
  && dl kuna-linux-$a.tar.gz \
       https://github.com/Noelo-Lab/kuna/releases/download/v${KUNA_VERSION}/kuna-v${KUNA_VERSION}-linux-$a.tar.gz \
@@ -183,7 +183,7 @@ RUN printf '#!/bin/sh\nexec java -jar /opt/rea/apktool.jar "$@"\n' > /usr/local/
  && printf '#!/bin/sh\nexec /usr/bin/chromium --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"\n' > /usr/local/bin/chromium-container \
  && chmod +x /usr/local/bin/apktool /usr/local/bin/chromium-container
 
-ARG REA_VERSION=6.7.0
+ARG REA_VERSION=6.8.0
 RUN npm install -g --no-audit --no-fund "rea-agents@${REA_VERSION}"
 
 ENV PATH=/opt/rizin/bin:/opt/bin:/opt/wabt/bin:/opt/mitmproxy:$PATH \
